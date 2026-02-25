@@ -1,0 +1,58 @@
+﻿@model List<Empleado>
+@{
+    ViewData["Title"] = "EmpleadosAlmacenados";
+}
+<a asp-controller="Empleados" asp-action="SessionEmpleadosOk"> VOLVER a Session Empleados OK</a>
+<h1 style="color:blueviolet">EmpleadosAlmacenadosOk</h1>
+
+ @if (Model != null)
+  {
+       <table class="table table-success">
+            <thead>
+                <tr>
+                    <th>
+                        IdEmpleado
+                    </th>
+                    <th>
+                        Apellido
+                    </th>
+                    <th>
+                        Oficio
+                    </th>
+                    <th>
+                        Salario
+                    </th>
+                    <th>
+                        IdDepartamento
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @item.IdEmpleado
+                        </td>
+                        <td>
+                            @item.Apellido
+                        </td>
+                        <td>
+                            @item.Oficio
+                        </td>
+                        <td>
+                            @item.Salario
+                        </td>
+                        <td>
+                            @item.IdDepartamento
+                        </td>
+                    </tr>
+                }
+            </tbody>
+       </table>
+    }
+
+else
+{
+    <h2 style="color:red">@ViewData["MENSAJE"]</h2>
+}

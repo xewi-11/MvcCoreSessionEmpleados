@@ -84,5 +84,91 @@ namespace MvcCoreSessionEmpleados.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> SessionEmpleadosOk(int? idempleado)
+        {
+            if (idempleado != null)
+            {
+                List<int> idsEmpleados;
+                if (HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") != null)
+                {
+                    idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+                }
+                else
+                {
+                    //si no existe se crea la collecion
+                    idsEmpleados = new List<int>();
+                }
+                //almacenamos el id del empleado
+                if (!idsEmpleados.Contains(idempleado.Value))
+                {
+                    idsEmpleados.Add(idempleado.Value);
+                    HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+                    ViewData["MENSAJE"] = " EMPLEADOS ALMACENADOS CORRECTAMENTE " + idsEmpleados.Count;
+                }
+            }
+            List<Empleado> empleados = await this.repo.GetEmpleadosAsync();
+            return View(empleados);
+        }
+        public async Task<IActionResult> EmpleadosAlmacenadosOk()
+        {
+
+            List<int> idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if (idsEmpleados == null)
+            {
+                ViewData["MENSAJE"] = "No existen empleados en session";
+                return View();
+            }
+            else
+            {
+                List<Empleado> empleados = await this.repo.GetEmpleadosByIdAsync(idsEmpleados);
+                return View(empleados);
+            }
+        }
+
+
+        public async Task<IActionResult> SessionEmpleadosV4(int? idempleado)
+        {
+            List<Empleado> empleados;
+            if (idempleado != null)
+            {
+                List<int> idsEmpleados;
+                if (HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") != null)
+                {
+                    idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+                    empleados = await this.repo.GetEmpleadosNoIdSessionAsync(HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS"));
+                }
+                else
+                {
+                    //si no existe se crea la collecion
+                    idsEmpleados = new List<int>();
+                }
+                //almacenamos el id del empleado
+                if (!idsEmpleados.Contains(idempleado.Value))
+                {
+                    idsEmpleados.Add(idempleado.Value);
+                    HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+                    ViewData["MENSAJE"] = " EMPLEADOS ALMACENADOS CORRECTAMENTE " + idsEmpleados.Count;
+                }
+            }
+
+            empleados = await this.repo.GetEmpleadosNoIdSessionAsync(HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS"));
+            return View(empleados);
+        }
+
+        public async Task<IActionResult> EmpleadosAlmacenadosV4()
+        {
+
+            List<int> idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if (idsEmpleados == null)
+            {
+                ViewData["MENSAJE"] = "No existen empleados en session";
+                return View();
+            }
+            else
+            {
+                List<Empleado> empleados = await this.repo.GetEmpleadosByIdAsync(idsEmpleados);
+                return View(empleados);
+            }
+        }
     }
 }
