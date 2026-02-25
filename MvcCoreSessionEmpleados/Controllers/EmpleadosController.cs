@@ -129,13 +129,14 @@ namespace MvcCoreSessionEmpleados.Controllers
         public async Task<IActionResult> SessionEmpleadosV4(int? idempleado)
         {
             List<Empleado> empleados;
+
             if (idempleado != null)
             {
                 List<int> idsEmpleados;
                 if (HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") != null)
                 {
                     idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
-                    empleados = await this.repo.GetEmpleadosNoIdSessionAsync(HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS"));
+
                 }
                 else
                 {
@@ -149,10 +150,20 @@ namespace MvcCoreSessionEmpleados.Controllers
                     HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
                     ViewData["MENSAJE"] = " EMPLEADOS ALMACENADOS CORRECTAMENTE " + idsEmpleados.Count;
                 }
+
+            }
+            List<int> idsEmpleadosAux2 = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if (idsEmpleadosAux2 == null)
+            {
+                empleados = await this.repo.GetEmpleadosAsync();
+                return View(empleados);
+            }
+            else
+            {
+                empleados = await this.repo.GetEmpleadosNoIdSessionAsync(HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS"));
+                return View(empleados);
             }
 
-            empleados = await this.repo.GetEmpleadosNoIdSessionAsync(HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS"));
-            return View(empleados);
         }
 
         public async Task<IActionResult> EmpleadosAlmacenadosV4()
