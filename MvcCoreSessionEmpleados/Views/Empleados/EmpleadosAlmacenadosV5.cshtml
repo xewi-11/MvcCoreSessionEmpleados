@@ -3,9 +3,14 @@
     ViewData["Title"] = "EmpleadosAlmacenados";
 }
 <a asp-controller="Empleados" asp-action="SessionEmpleadosV4"> VOLVER a Session Empleados OK</a>
-<h1 style="color:yellow">EmpleadosAlmacenadosOk</h1>
+<h1 style="color:pink">EmpleadosAlmacenadosOk</h1>
 
-@if (Model != null)
+
+@if (Context.Session.GetString("IDSEMPLEADOS") == null)
+{
+    <h2>No existen empleados en session</h2>
+}
+else
 {
     <table class="table table-warning">
         <thead>
@@ -25,6 +30,7 @@
                 <th>
                     IdDepartamento
                 </th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -46,12 +52,12 @@
                     <td>
                         @item.IdDepartamento
                     </td>
+                    <td><a asp-controller="Empleados" asp-action="EmpleadosAlmacenadosV5" asp-route-ideliminar="@item.IdEmpleado">Eliminar session</a></td>
                 </tr>
             }
         </tbody>
     </table>
-}
-else
+}else
 {
-    <h2 style="color:red">@ViewData["MENSAJE"]</h2>
+    <h2 style="color:brown">@ViewData["MENSAJE"]</h2>
 }

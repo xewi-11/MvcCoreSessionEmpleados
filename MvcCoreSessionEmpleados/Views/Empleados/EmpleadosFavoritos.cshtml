@@ -1,0 +1,65 @@
+﻿@model List<Empleado>
+@{
+    List<Empleado> favoritos = memoryCache.Get<List<Empleado>>("FAVORITOS");
+}
+
+<h1>Empeados favoritos</h1>
+
+<p>
+
+
+    <a asp-controller="Empleados"
+    asp-action="SessionEmpleadosV5">Volver a Empleados V5</a>
+
+</p>
+@if(favoritos!=null){
+<table class="table table-warning">
+    <thead>
+        <tr>
+            <th>
+                IdEmpleado
+            </th>
+            <th>
+                Apellido
+            </th>
+            <th>
+                Oficio
+            </th>
+            <th>
+                Salario
+            </th>
+            <th>
+                IdDepartamento
+            </th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in favoritos)
+        {
+            <tr>
+                <td>
+                    @item.IdEmpleado
+                </td>
+                <td>
+                    @item.Apellido
+                </td>
+                <td>
+                    @item.Oficio
+                </td>
+                <td>
+                    @item.Salario
+                </td>
+                <td>
+                    @item.IdDepartamento
+                </td>
+               
+            </tr>
+        }
+    </tbody>
+</table>
+}
+else
+{
+    <h2>VIewData["MENSAJE"]</h2>
+}

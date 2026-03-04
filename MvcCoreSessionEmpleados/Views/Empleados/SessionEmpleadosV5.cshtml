@@ -1,0 +1,65 @@
+﻿
+@model List<Empleado>
+
+
+@{
+    //NECESIRTAMOS SESSION EN LA VISTA PARA LOS IDS
+    List<int> ids = Context.Session.GetObject<List<int>>("IDSEMPLEADOS");
+
+    List<Empleado> favoritos=memoryCache.Get<List<Empleado>>("FAVORITOS");
+}
+
+<h1 style="color:pink">Session Empleados List V5 </h1>
+
+@if(ids!=null){
+    <h3 style="background-color:lightgreen">Empleados en Session: @ids.Count</h3>
+}
+@if (favoritos != null)
+{
+    <h3 style="background-color:lightcoral">Favoritos: @favoritos.Count</h3>
+}
+
+<p>
+
+
+
+    <a asp-controller="Empleados" asp-action="EmpleadosAlmacenadosV5">Empleados Almacenados v5</a>
+
+
+    <a asp-controller="Empleados" asp-action="EmpleadosFavoritos">Empleados Favoritos</a>
+
+</p>
+
+<ul class="list-group">
+
+    @foreach (Empleado empleado in Model)
+    {
+        <li class="list-group-item" style="color:coral; background-color:orange">
+            @empleado.Apellido
+            <a asp-controller="Empleados" asp-action="SessionEmpleadosV5" asp-route-idfavorito="@empleado.IdEmpleado">Favorito</a>
+
+            @*PREGUNTAMOS SI EXISTE EMPLEADO EN SESION*@
+            @if (ids == null)
+            {
+                //NO tenemos sesion
+
+                <a asp-controller="Empleados" asp-action="SessionEmpleadosV5" asp-route-idempleado="@empleado.IdEmpleado">Almacenar empleado</a>
+            }
+            else
+            {
+                //BUSCAMOS SI EL ID DEL EMPLEADO ESTA EN LA COLLECION IDS
+                if (ids.Contains(empleado.IdEmpleado))
+                {
+                    <img src="~/Images/OIP.jfif" style="width:40px; height:40px"/>
+                }
+                else
+                {
+                    <a asp-controller="Empleados" asp-action="SessionEmpleadosV5" asp-route-idempleado="@empleado.IdEmpleado">Almacenar empleado</a>
+                }
+            }
+
+        </li>
+
+    }
+
+</ul>

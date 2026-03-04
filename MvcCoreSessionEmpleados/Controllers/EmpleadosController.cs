@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using MvcCoreSessionEmpleados.Extensions;
 using MvcCoreSessionEmpleados.Models;
 using MvcCoreSessionEmpleados.Repositories;
@@ -8,10 +9,12 @@ namespace MvcCoreSessionEmpleados.Controllers
     public class EmpleadosController : Controller
     {
         private RepositoryEmpleados repo;
+        private IMemoryCache memoryCache;
 
-        public EmpleadosController(RepositoryEmpleados repo)
+        public EmpleadosController(RepositoryEmpleados repo,IMemoryCache memoryCache)
         {
             this.repo = repo;
+            this.memoryCache = memoryCache;
         }
 
         public IActionResult Index()
@@ -180,6 +183,86 @@ namespace MvcCoreSessionEmpleados.Controllers
                 List<Empleado> empleados = await this.repo.GetEmpleadosByIdAsync(idsEmpleados);
                 return View(empleados);
             }
+        }
+        
+        public async Task<IActionResult> SessionEmpleadosV5(int? idempleado,int? idfavorito)
+        {
+
+            if (idfavorito != null)
+            {
+                //COMO ESTOY ALMACENANDO EN CACHE VAMOS A GUARDAR IRECTAMENTE LOS OBJETOS EN LUGAR DE LOS IDS
+                List<Empleado> empleadosFavoritos;
+                if (this.memoryCache.Get("FAVORITOS") == null)
+                {
+                    //No EXISTE NADA EN CACHE
+                    empleadosFavoritos = new List<Empleado>();
+                }
+                else
+                {
+                    //REcuperamos el cache 
+
+                    empleadosFavoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
+                }
+
+                //BUSCAMOS EL EMPLEADO PARA GUARDARLO
+
+                Empleado empleadoFav = await this.repo.FindEmpleadoAsync(idfavorito.Value);
+                empleadosFavoritos.Add(empleadoFav);
+                this.memoryCache.Set("FAVORITOS", empleadosFavoritos);
+            }
+
+
+
+            if (idempleado != null)
+            {
+                List<int> idsEmpleadosList;
+                if (HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") != null)
+                {
+                    idsEmpleadosList = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+                }
+                else
+                {
+                    idsEmpleadosList = new List<int>();
+                }
+                idsEmpleadosList.Add(idempleado.Value);
+                HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleadosList);
+                ViewData["MENSAJE"] = "Empleados almacenados: " + idsEmpleadosList.Count;
+            }
+            List<Empleado> empleados = await this.repo.GetEmpleadosAsync();
+            return View(empleados);
+        }
+        
+        public async Task<IActionResult> EmpleadosAlmacenadosV5(int? ideliminar)
+        {
+
+            List<int> idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if (idsEmpleados == null)
+            {
+                ViewData["MENSAJE"] = "No existen empleados en session";
+                return View();
+            }
+            else
+            {
+                if (ideliminar != null)
+                {
+                    idsEmpleados.Remove(ideliminar.Value);
+                    if (idsEmpleados.Count == 0)
+                    {
+                        HttpContext.Session.Remove("IDSEMPLEADOS");
+                    }
+                    else
+                    {
+                        HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+                    }
+                   
+                }
+            }
+            List<Empleado> empleados = await this.repo.GetEmpleadosByIdAsync(idsEmpleados);
+            return View(empleados);
+        }
+        public IActionResult EmpleadosFavoritos()
+        {
+            return View();
         }
     }
 }
