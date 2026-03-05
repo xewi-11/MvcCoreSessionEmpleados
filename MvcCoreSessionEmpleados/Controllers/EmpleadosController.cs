@@ -260,8 +260,26 @@ namespace MvcCoreSessionEmpleados.Controllers
             List<Empleado> empleados = await this.repo.GetEmpleadosByIdAsync(idsEmpleados);
             return View(empleados);
         }
-        public IActionResult EmpleadosFavoritos()
+        public IActionResult EmpleadosFavoritos(int? ideliminar)
         {
+            if (ideliminar != null)
+            {
+                List<Empleado> favoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
+                //BUSCAR EMPLEADO PARA ELIMINAR POR SU ID
+
+                Empleado delete = favoritos.Find(z => z.IdEmpleado == ideliminar.Value);
+                favoritos.Remove(delete);
+
+                if (favoritos.Count == 0)
+                {
+                    this.memoryCache.Remove("FAVORITOS");
+
+                }
+                else
+                {
+                    this.memoryCache.Set("FAVORITOS", favoritos);
+                }
+            }
             return View();
         }
     }

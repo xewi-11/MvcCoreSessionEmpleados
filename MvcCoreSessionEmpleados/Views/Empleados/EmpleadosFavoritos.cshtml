@@ -31,6 +31,7 @@
             <th>
                 IdDepartamento
             </th>
+            
            
         </tr>
     </thead>
@@ -53,7 +54,7 @@
                 <td>
                     @item.IdDepartamento
                 </td>
-               
+                <td><a class="btn btn-warning" asp-controller="Empleados" asp-action="EmpleadosFavoritos" asp-route-ideliminar="@item.IdEmpleado">Delete</a></td>
             </tr>
         }
     </tbody>
